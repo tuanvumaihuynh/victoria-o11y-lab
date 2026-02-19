@@ -1,0 +1,53 @@
+sources:
+  otel:
+    type: opentelemetry
+    grpc:
+      address: 0.0.0.0:4317
+    http:
+      address: 0.0.0.0:4318
+
+  docker_logs:
+    type: docker_logs
+
+  host_metrics:
+    type: host_metrics
+    collectors:
+      - cpu
+      - memory
+      - disk
+      - filesystem
+      - network
+    scrape_interval_secs: 15
+
+  internal_metrics:
+    type: internal_metrics
+    scrape_interval_secs: 15
+
+sinks:
+  victoria_metrics:
+    type: prometheus_remote_write
+    inputs: ["host_metrics", "internal_metrics"]
+    endpoint: http://victoria-metrics:8428/api/v1/write
+
+  victoria_logs:
+    type: elasticsearch
+    inputs: ["docker_logs"]
+    endpoints:
+      - http://victoria-logs:9428/insert/elasticsearch/
+    api_version: v8
+    compression: gzip
+    healthcheck:
+      enabled: false
+    query:
+      _msg_field: message
+      _time_field: timestamp
+      _stream_fields: host,container_name
+
+  victoria_traces:
+    type: opentelemetry
+    inputs: ["otel.traces"]
+    protocol:
+      type: http
+      uri: http://victoria-traces:8427/insert/opentelemetry/v1/traces
+      encoding:
+        codec: otlp

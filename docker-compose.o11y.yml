@@ -1,0 +1,85 @@
+services:
+  victoria-metrics:
+    image: victoriametrics/victoria-metrics:v1.136.0
+    restart: unless-stopped
+    command:
+      - "--storageDataPath=/storage"
+      - "--httpListenAddr=:8428"
+    ports:
+      - 8428:8428
+    volumes:
+      - vm-data:/storage
+    networks:
+      - victoria-o11y-lab
+
+  victoria-logs:
+    image: victoriametrics/victoria-logs:v1.45.0
+    restart: unless-stopped
+    command:
+      - "--storageDataPath=/vlogs"
+      - "--httpListenAddr=:9428"
+    ports:
+      - 9428:9428
+    volumes:
+      - vl-data:/vlogs
+    networks:
+      - victoria-o11y-lab
+
+  victoria-traces:
+    image: victoriametrics/victoria-traces:v0.7.1
+    restart: unless-stopped
+    command:
+      - "--storageDataPath=/vtraces"
+      - "--httpListenAddr=:8427"
+    ports:
+      - 8427:8427
+    volumes:
+      - vt-data:/vtraces
+    networks:
+      - victoria-o11y-lab
+
+  grafana:
+    image: grafana/grafana:12.4.0-22081664032
+    restart: unless-stopped
+    environment:
+      GF_AUTH_ANONYMOUS_ENABLED: true
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
+      GF_AUTH_DISABLE_LOGIN_FORM: true
+      GF_INSTALL_PLUGINS: victoriametrics-logs-datasource
+    ports:
+      - 3000:3000
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./docker/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
+      - ./docker/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
+    depends_on:
+      - victoria-metrics
+      - victoria-logs
+      - victoria-traces
+    networks:
+      - victoria-o11y-lab
+
+  vector:
+    image: timberio/vector:0.53.0-alpine
+    restart: unless-stopped
+    ports:
+      - 4317:4317
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./docker/vector/config.yml:/etc/vector/vector.yaml:ro
+    depends_on:
+      - victoria-metrics
+      - victoria-logs
+      - victoria-traces
+    networks:
+      - victoria-o11y-lab
+
+volumes:
+  vm-data:
+  vl-data:
+  vt-data:
+  grafana-data:
+
+networks:
+  victoria-o11y-lab:
+    driver: bridge
