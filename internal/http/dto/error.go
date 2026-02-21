@@ -41,7 +41,7 @@ func (e *ErrorResponse) GetStatus() int {
 }
 
 func errorToErrorResponse(err error) *ErrorResponse {
-	zErr, ok := errors.AsType[zerror.ZError](err)
+	zErr, ok := errors.AsType[*zerror.ZError](err)
 	if ok {
 		return &ErrorResponse{
 			Code:       zErr.MsgID(),

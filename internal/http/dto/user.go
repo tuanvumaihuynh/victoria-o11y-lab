@@ -2,7 +2,7 @@ package dto
 
 import "time"
 
-type CreateUserPayload struct {
+type CreateUserRequestBody struct {
 	Name  string `json:"name" minLength:"1" example:"John Doe"`
 	Email string `json:"email" format:"email" example:"john.doe@example.com"`
 	//nolint:gosec
@@ -10,7 +10,7 @@ type CreateUserPayload struct {
 }
 
 type CreateUserRequest struct {
-	Body CreateUserPayload
+	Body CreateUserRequestBody
 }
 
 type CreateUserResponseBody struct {
