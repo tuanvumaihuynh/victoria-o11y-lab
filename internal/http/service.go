@@ -12,12 +12,11 @@ import (
 	"github.com/danielgtaylor/huma/v2/adapters/humachi"
 	"github.com/go-chi/chi/v5"
 
-	"github.com/tuanvumaihuynh/victoria-o11y-lab/internal/http/dto"
 	"github.com/tuanvumaihuynh/victoria-o11y-lab/internal/http/middleware"
 )
 
 type Config struct {
-	Port          uint `yaml:"port"`
+	Port           uint `yaml:"port"`
 	SwaggerEnabled bool `yaml:"swagger_enabled"`
 }
 
@@ -103,56 +102,4 @@ func (s *Service) newHumaAPI(r *chi.Mux) huma.API {
 	api := humachi.New(r, cfg)
 
 	return api
-}
-
-func newHumaError(logger *slog.Logger) func(status int, message string, errs ...error) huma.StatusError {
-	return func(status int, message string, errs ...error) huma.StatusError {
-		if len(errs) == 0 {
-			// Avoid logging when huma register route
-			if status != 0 {
-				logger.Error(
-					"no error provided in huma error handler",
-					slog.Int("status", status),
-					slog.String("message", message),
-				)
-			}
-			return dto.InternalServerErrResponse
-		}
-
-		err := errs[0]
-		errResp := dto.NewErrorResponse(err)
-		if errResp.GetStatus() >= 500 {
-			logger.Error("handler error", slog.Any("error", err))
-		}
-
-		return errResp
-	}
-}
-
-func newHumaErrorWithContext(logger *slog.Logger) func(hctx huma.Context, status int, message string, errs ...error) huma.StatusError {
-	return func(hctx huma.Context, status int, message string, errs ...error) huma.StatusError {
-		ctx := hctx.Context()
-
-		if len(errs) == 0 {
-			// Avoid logging when huma register route
-			if status != 0 {
-				logger.ErrorContext(
-					ctx,
-					"no error provided in huma error handler",
-					slog.Int("status", status),
-					slog.String("message", message),
-				)
-			}
-			return dto.InternalServerErrResponse
-		}
-
-		err := errs[0]
-
-		errResp := dto.NewErrorResponse(err)
-		if errResp.GetStatus() >= 500 {
-			logger.ErrorContext(ctx, "handler error", slog.Any("error", err))
-		}
-
-		return errResp
-	}
 }

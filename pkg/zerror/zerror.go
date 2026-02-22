@@ -9,16 +9,16 @@ import (
 type ZError struct {
 	parent error
 	status Status
-	msgID  string
+	code   string
 	msg    string
 }
 
 // NewZError initializes a ZError instance.
-func NewZError(parent error, status Status, msgID, msg string) *ZError {
+func NewZError(parent error, status Status, code, msg string) *ZError {
 	return &ZError{
 		parent: parent,
 		status: status,
-		msgID:  msgID,
+		code:   code,
 		msg:    msg,
 	}
 }
@@ -40,9 +40,9 @@ func WithMsg(e ZError, msg string) ZError {
 
 func (e ZError) Error() string {
 	if e.parent != nil {
-		return fmt.Sprintf("ID=%s, Msg=%s, Parent=(%v)", e.msgID, e.msg, e.parent)
+		return fmt.Sprintf("Code=%s, Msg=%s, Parent=(%v)", e.code, e.msg, e.parent)
 	}
-	return fmt.Sprintf("ID=%s, Msg=%s", e.msgID, e.msg)
+	return fmt.Sprintf("Code=%s, Msg=%s", e.code, e.msg)
 }
 
 func (e *ZError) Unwrap() error {
@@ -53,8 +53,8 @@ func (e ZError) Status() Status {
 	return e.status
 }
 
-func (e ZError) MsgID() string {
-	return e.msgID
+func (e ZError) Code() string {
+	return e.code
 }
 
 func (e ZError) Msg() string {
@@ -65,54 +65,54 @@ func (e ZError) Parent() error {
 	return e.parent
 }
 
-func NewUnauthorized(msgID, msg string) *ZError {
-	return NewZError(nil, StatusUnauthorized, msgID, msg)
+func NewUnauthorized(code, msg string) *ZError {
+	return NewZError(nil, StatusUnauthorized, code, msg)
 }
 
-func NewForbidden(msgID, msg string) *ZError {
-	return NewZError(nil, StatusForbidden, msgID, msg)
+func NewForbidden(code, msg string) *ZError {
+	return NewZError(nil, StatusForbidden, code, msg)
 }
 
-func NewNotFound(msgID, msg string) *ZError {
-	return NewZError(nil, StatusNotFound, msgID, msg)
+func NewNotFound(code, msg string) *ZError {
+	return NewZError(nil, StatusNotFound, code, msg)
 }
 
-func NewUnprocessableEntity(msgID, msg string) *ZError {
-	return NewZError(nil, StatusUnprocessableEntity, msgID, msg)
+func NewUnprocessableEntity(code, msg string) *ZError {
+	return NewZError(nil, StatusUnprocessableEntity, code, msg)
 }
 
-func NewConflict(msgID, msg string) *ZError {
-	return NewZError(nil, StatusConflict, msgID, msg)
+func NewConflict(code, msg string) *ZError {
+	return NewZError(nil, StatusConflict, code, msg)
 }
 
-func NewTooManyRequests(msgID, msg string) *ZError {
-	return NewZError(nil, StatusTooManyRequests, msgID, msg)
+func NewTooManyRequests(code, msg string) *ZError {
+	return NewZError(nil, StatusTooManyRequests, code, msg)
 }
 
-func NewBadRequest(msgID, msg string) *ZError {
-	return NewZError(nil, StatusBadRequest, msgID, msg)
+func NewBadRequest(code, msg string) *ZError {
+	return NewZError(nil, StatusBadRequest, code, msg)
 }
 
-func NewValidationFailed(msg string) *ZError {
-	return NewZError(nil, StatusValidationFailed, "validationFailed", msg)
+func NewValidationFailed(code, msg string) *ZError {
+	return NewZError(nil, StatusValidationFailed, code, msg)
 }
 
-func NewInternalServerError(msgID, msg string) *ZError {
-	return NewZError(nil, StatusInternalServerError, msgID, msg)
+func NewInternalServerError(code, msg string) *ZError {
+	return NewZError(nil, StatusInternalServerError, code, msg)
 }
 
-func NewTimeout(msgID, msg string) *ZError {
-	return NewZError(nil, StatusTimeout, msgID, msg)
+func NewTimeout(code, msg string) *ZError {
+	return NewZError(nil, StatusTimeout, code, msg)
 }
 
-func NewNotImplemented(msgID, msg string) *ZError {
-	return NewZError(nil, StatusNotImplemented, msgID, msg)
+func NewNotImplemented(code, msg string) *ZError {
+	return NewZError(nil, StatusNotImplemented, code, msg)
 }
 
-func NewBadGateway(msgID, msg string) *ZError {
-	return NewZError(nil, StatusBadGateway, msgID, msg)
+func NewBadGateway(code, msg string) *ZError {
+	return NewZError(nil, StatusBadGateway, code, msg)
 }
 
-func NewServiceUnavailable(msgID, msg string) *ZError {
-	return NewZError(nil, StatusServiceUnavailable, msgID, msg)
+func NewServiceUnavailable(code, msg string) *ZError {
+	return NewZError(nil, StatusServiceUnavailable, code, msg)
 }

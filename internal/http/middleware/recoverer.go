@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"runtime/debug"
 
+	"github.com/tuanvumaihuynh/victoria-o11y-lab/internal/apperr"
 	"github.com/tuanvumaihuynh/victoria-o11y-lab/internal/http/dto"
 )
 
@@ -15,6 +16,11 @@ import (
 //
 // Recoverer prints a stack trace of the last function call.
 func Recoverer(log *slog.Logger) func(http.Handler) http.Handler {
+	res := &dto.ErrorResponse{
+		Code:    apperr.InternalServerErr.Code(),
+		Message: apperr.InternalServerErr.Msg(),
+	}
+
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			defer func() {
@@ -31,7 +37,7 @@ func Recoverer(log *slog.Logger) func(http.Handler) http.Handler {
 					if r.Header.Get("Connection") != "Upgrade" {
 						w.Header().Set("Content-Type", "application/json")
 						w.WriteHeader(http.StatusInternalServerError)
-						if err := json.NewEncoder(w).Encode(dto.InternalServerErrResponse); err != nil {
+						if err := json.NewEncoder(w).Encode(res); err != nil {
 							log.ErrorContext(r.Context(), "error encoding response", slog.Any("error", err))
 						}
 					}
