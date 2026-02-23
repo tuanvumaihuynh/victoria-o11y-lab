@@ -21,9 +21,6 @@ type Config struct {
 	Insecure      bool    `yaml:"INSECURE"`
 	TraceIDRatio  float64 `yaml:"TRACE_ID_RATIO"`
 	CollectorAuth string  `yaml:"COLLECTOR_AUTH"`
-
-	K8sPodName   string `yaml:"K8S_POD_NAME"`
-	K8sNamespace string `yaml:"NAMESPACE"`
 }
 
 func (c *Config) Validate() error {
@@ -71,11 +68,6 @@ func InitTracer(ctx context.Context, cfg Config) (CleanupFunc, error) {
 	resourceAttrs := []attribute.KeyValue{
 		attribute.String("service.name", cfg.ServiceName),
 		attribute.String("library.language", "go"),
-	}
-
-	if cfg.K8sPodName != "" && cfg.K8sNamespace != "" {
-		resourceAttrs = append(resourceAttrs, attribute.String("k8s.pod.name", cfg.K8sPodName))
-		resourceAttrs = append(resourceAttrs, attribute.String("k8s.namespace", cfg.K8sNamespace))
 	}
 
 	resources, err := resource.New(

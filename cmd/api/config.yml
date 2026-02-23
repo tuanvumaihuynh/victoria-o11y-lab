@@ -26,5 +26,3 @@ otel:
   insecure: true
   trace_id_ratio: 0.1
   collector_auth: ""
-  k8s_pod_name: ""
-  k8s_namespace: ""
