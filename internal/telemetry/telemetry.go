@@ -16,11 +16,11 @@ import (
 )
 
 type Config struct {
-	ServiceName   string  `yaml:"SERVICE_NAME"`
-	CollectorURL  string  `yaml:"COLLECTOR_URL"`
-	Insecure      bool    `yaml:"INSECURE"`
-	TraceIDRatio  float64 `yaml:"TRACE_ID_RATIO"`
-	CollectorAuth string  `yaml:"COLLECTOR_AUTH"`
+	ServiceName   string  `yaml:"service_name"`
+	CollectorURL  string  `yaml:"collector_url"`
+	Insecure      bool    `yaml:"insecure"`
+	TraceIDRatio  float64 `yaml:"trace_id_ratio"`
+	CollectorAuth string  `yaml:"collector_auth"`
 }
 
 func (c *Config) Validate() error {
