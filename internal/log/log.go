@@ -82,7 +82,7 @@ func NewLogger(cfg Config) (*slog.Logger, error) {
 		})
 	}
 
-	log := slog.New(handler)
+	log := slog.New(newTraceHandler(handler))
 	slog.SetDefault(log)
 
 	return log, nil

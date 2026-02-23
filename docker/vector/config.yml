@@ -1,6 +1,8 @@
+# Sources config: https://vector.dev/docs/reference/configuration/sources/
 sources:
   otel:
     type: opentelemetry
+    use_otlp_decoding: true
     grpc:
       address: 0.0.0.0:4317
     http:
@@ -29,6 +31,7 @@ sources:
       - http://app-api:8000/metrics
     scrape_interval_secs: 15
 
+# Sinks config: https://vector.dev/docs/reference/configuration/sinks/
 sinks:
   victoria_metrics:
     type: prometheus_remote_write
