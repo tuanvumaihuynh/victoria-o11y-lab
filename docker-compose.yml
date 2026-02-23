@@ -55,6 +55,10 @@ services:
       - API_POSTGRES__PASSWORD=postgres
       - API_POSTGRES__DB=postgres
       - API_POSTGRES__SSL_MODE=disable
+      - API_OTEL__SERVICE_NAME=victoria-o11y-lab-api
+      - API_OTEL__COLLECTOR_URL=lgtm:4317
+      - API_OTEL__INSECURE=true
+      - API_OTEL__TRACE_ID_RATIO=1.0
 
 volumes:
   pg-data:

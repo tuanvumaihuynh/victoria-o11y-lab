@@ -8,6 +8,7 @@ import (
 
 	"github.com/tuanvumaihuynh/victoria-o11y-lab/internal/http"
 	"github.com/tuanvumaihuynh/victoria-o11y-lab/internal/log"
+	"github.com/tuanvumaihuynh/victoria-o11y-lab/internal/telemetry"
 	"github.com/tuanvumaihuynh/victoria-o11y-lab/pkg/cmdutil"
 )
 
@@ -35,6 +36,16 @@ func run() error {
 	if err != nil {
 		return fmt.Errorf("new logger: %w", err)
 	}
+
+	cleanupTracer, err := telemetry.InitTracer(ctx, cfg.Otel)
+	if err != nil {
+		return fmt.Errorf("init tracer: %w", err)
+	}
+	defer func() {
+		if err := cleanupTracer(ctx); err != nil {
+			logger.ErrorContext(ctx, "error cleaning up tracer", slog.Any("error", err))
+		}
+	}()
 
 	interruptChan := cmdutil.InterruptChan()
 
