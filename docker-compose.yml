@@ -20,15 +20,15 @@ services:
     env_file:
       - .env
     environment:
-      - MIGRATE_LOG__FORMAT=json
-      - MIGRATE_LOG__LEVEL=info
-      - MIGRATE_LOG__ADD_SOURCE=true
-      - MIGRATE_POSTGRES__HOST=postgres
-      - MIGRATE_POSTGRES__PORT=5432
-      - MIGRATE_POSTGRES__USER=postgres
-      - MIGRATE_POSTGRES__PASSWORD=postgres
-      - MIGRATE_POSTGRES__DB=postgres
-      - MIGRATE_POSTGRES__SSL_MODE=disable
+      MIGRATE_LOG__FORMAT: json
+      MIGRATE_LOG__LEVEL: info
+      MIGRATE_LOG__ADD_SOURCE: true
+      MIGRATE_POSTGRES__HOST: postgres
+      MIGRATE_POSTGRES__PORT: 5432
+      MIGRATE_POSTGRES__USER: postgres
+      MIGRATE_POSTGRES__PASSWORD: postgres
+      MIGRATE_POSTGRES__DB: postgres
+      MIGRATE_POSTGRES__SSL_MODE: disable
     depends_on:
       - postgres
     networks:
@@ -44,17 +44,25 @@ services:
     env_file:
       - .env
     environment:
-      - API_LOG__FORMAT=json
-      - API_LOG__LEVEL=info
-      - API_LOG__ADD_SOURCE=true
-      - API_HTTP__PORT=8000
-      - API_HTTP__SWAGGER_ENABLED=true
-      - API_POSTGRES__HOST=postgres
-      - API_POSTGRES__PORT=5432
-      - API_POSTGRES__USER=postgres
-      - API_POSTGRES__PASSWORD=postgres
-      - API_POSTGRES__DB=postgres
-      - API_POSTGRES__SSL_MODE=disable
+      API_LOG__FORMAT: json
+      API_LOG__LEVEL: info
+      API_LOG__ADD_SOURCE: true
+      API_HTTP__PORT: 8000
+      API_HTTP__SWAGGER_ENABLED: true
+      API_POSTGRES__HOST: postgres
+      API_POSTGRES__PORT: 5432
+      API_POSTGRES__USER: postgres
+      API_POSTGRES__PASSWORD: postgres
+      API_POSTGRES__DB: postgres
+      API_POSTGRES__SSL_MODE: disable
+      API_OTEL__SERVICE_NAME: victoria-o11y-lab-api
+      API_OTEL__COLLECTOR_URL: vector:4317
+      API_OTEL__INSECURE: true
+      API_OTEL__TRACE_ID_RATIO: 1.0
+    depends_on:
+      - postgres
+    networks:
+      - victoria-o11y-lab
 
 volumes:
   pg-data:

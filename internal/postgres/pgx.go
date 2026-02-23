@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/exaring/otelpgx"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -71,6 +72,8 @@ func NewPgxPool(ctx context.Context, cfg Config) (*pgxpool.Pool, error) {
 		return nil, fmt.Errorf("parse config: %w", err)
 	}
 
+	pgConf.ConnConfig.Tracer = newTracer()
+
 	pgConf.MaxConns = cfg.MaxConns
 	pgConf.MinConns = cfg.MinConns
 	pgConf.MaxConnLifetime = cfg.MaxConnLifetime
@@ -79,6 +82,10 @@ func NewPgxPool(ctx context.Context, cfg Config) (*pgxpool.Pool, error) {
 	pool, err := pgxpool.NewWithConfig(ctx, pgConf)
 	if err != nil {
 		return nil, fmt.Errorf("create pool: %w", err)
+	}
+
+	if err := otelpgx.RecordStats(pool); err != nil {
+		return nil, fmt.Errorf("record database stats: %w", err)
 	}
 
 	// Create a context with timeout for ping

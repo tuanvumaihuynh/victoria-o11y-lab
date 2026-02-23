@@ -16,6 +16,7 @@ import (
 	"github.com/tuanvumaihuynh/victoria-o11y-lab/internal/http"
 	"github.com/tuanvumaihuynh/victoria-o11y-lab/internal/log"
 	"github.com/tuanvumaihuynh/victoria-o11y-lab/internal/postgres"
+	"github.com/tuanvumaihuynh/victoria-o11y-lab/internal/telemetry"
 
 	_ "embed"
 )
@@ -24,9 +25,10 @@ import (
 var defaultConfigBytes []byte
 
 type Config struct {
-	Log      log.Config      `yaml:"log"`
-	Postgres postgres.Config `yaml:"postgres"`
-	HTTP     http.Config     `yaml:"http"`
+	Log      log.Config       `yaml:"log"`
+	Postgres postgres.Config  `yaml:"postgres"`
+	HTTP     http.Config      `yaml:"http"`
+	Otel     telemetry.Config `yaml:"otel"`
 }
 
 func (c *Config) Validate() error {
@@ -42,9 +44,16 @@ func (c *Config) Validate() error {
 		return fmt.Errorf("http: %w", err)
 	}
 
+	if err := c.Otel.Validate(); err != nil {
+		return fmt.Errorf("otel: %w", err)
+	}
+
 	return nil
 }
 
+// NewConfig loads and merges configuration from the embedded default,
+// flags, optional external config file, and environment variables (in this order).
+// It returns the final Config struct or an error if loading or unmarshalling fails.
 func NewConfig() (*Config, error) {
 	k := koanf.New(".")
 
