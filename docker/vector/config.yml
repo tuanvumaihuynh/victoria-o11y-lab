@@ -23,10 +23,16 @@ sources:
     type: internal_metrics
     scrape_interval_secs: 15
 
+  app_metrics:
+    type: prometheus_scrape
+    endpoints:
+      - http://app-api:8000/metrics
+    scrape_interval_secs: 15
+
 sinks:
   victoria_metrics:
     type: prometheus_remote_write
-    inputs: ["host_metrics", "internal_metrics"]
+    inputs: ["host_metrics", "internal_metrics", "app_metrics"]
     endpoint: http://victoria-metrics:8428/api/v1/write
 
   victoria_logs:
