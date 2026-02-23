@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/middleware"
+	"github.com/go-chi/chi/v5"
 
 	"github.com/tuanvumaihuynh/victoria-o11y-lab/internal/http/metrics"
 )
@@ -26,7 +27,16 @@ func Metrics(m *metrics.Metrics) func(http.Handler) http.Handler {
 			next.ServeHTTP(ww, r)
 
 			duration := time.Since(t1).Seconds()
-			labels := []string{r.Method, r.URL.Path}
+
+			// Use the matched route pattern instead of the concrete URL
+			// to avoid unbounded cardinality from path parameters.
+			routePattern := r.URL.Path
+			if rctx := chi.RouteContext(r.Context()); rctx != nil {
+				if pattern := rctx.RoutePattern(); pattern != "" {
+					routePattern = pattern
+				}
+			}
+			labels := []string{r.Method, routePattern}
 
 			m.RequestsTotal.WithLabelValues(labels...).Inc()
 			m.RequestDuration.WithLabelValues(labels...).Observe(duration)
